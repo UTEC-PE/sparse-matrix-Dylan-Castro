@@ -61,15 +61,17 @@ class Matrix {
             while((*tempy)->x<x);
             //cout << (*nodo_y_anterior)->down << "---" << (*nodo_x_anterior)->next << endl;
             if((*nodo_y_anterior)->down != nullptr && (*nodo_x_anterior)->next != nullptr){
-                if(data==0){
-                    Node<T>* temp= (*nodo_x_anterior)->next;
-                    (*nodo_x_anterior)->next= (*nodo_x_anterior)->next->next;
-                    (*nodo_y_anterior)->down= (*nodo_y_anterior)->down->down;
-                    delete temp;
+                if((*nodo_y_anterior)->down->y==y && (*nodo_x_anterior)->next->x == x){
+                    if(data==0){
+                        Node<T>* temp= (*nodo_x_anterior)->next;
+                        (*nodo_x_anterior)->next= (*nodo_x_anterior)->next->next;
+                        (*nodo_y_anterior)->down= (*nodo_y_anterior)->down->down;
+                        delete temp;
+                        return;
+                    }
+                    (*nodo_y_anterior)->down->set(x,y,data);
                     return;
                 }
-                (*nodo_y_anterior)->down->set(x,y,data);
-                return;
             }
             Node<T>* nodo=new Node<T>;
             nodo->set(x,y,data);
@@ -78,6 +80,8 @@ class Matrix {
             (*nodo_x_anterior)->next=nodo;
             (*nodo_y_anterior)->down=nodo;
         };
+
+
         T operator()(int x, int y){
             Node<T>* tempx=hRows;
             Node<T>* tempy;
@@ -100,9 +104,20 @@ class Matrix {
                 return false;
             }
         };
+        void print(){
+            cout << hColumns->down->x << endl;
+            cout << hColumns->down->down->x << endl;
+            cout << hColumns->down->down->down->x << endl;
+        };
         Matrix<T> operator*(Matrix<T> other);
         Matrix<T> operator*(T scalar);
-        Matrix<T> operator+(Matrix<T> other);
+        Matrix<T> operator+(Matrix<T> other){
+            for(int x=0;x<5;x++){
+                for(int y=0;y<5;y++){
+                    //set(x,y,this->operator()(x,y)+ other.operator()(x,y));
+                }
+            }
+        };
         Matrix<T> operator-(Matrix<T> other);
         Matrix<T> transposed();
         Matrix<T> operator=(Matrix<T> other);
