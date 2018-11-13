@@ -28,100 +28,142 @@ class Matrix {
             }
         };
         void set(int x, int y, T data){
-            Node<T>** tempx= &hRows;
-            Node<T>** tempy= &hColumns;
+            Node<T>** fila= &hRows;
+            Node<T>** columna= &hColumns;
             Node<T>** nodo_x_anterior;
             Node<T>** nodo_y_anterior;
-            for(int i=0;i<y;i++){
-                tempy=&(*tempy)->next;
-            }
-            nodo_y_anterior=tempy;
-            tempx=&*tempy;
-            do{
-                if((*tempx)->down==nullptr){
-                    break;
-                }
-                nodo_y_anterior=tempx;
-                tempx=&(*tempx)->down;
-            }
-            while((*tempx)->y < y);
-            tempx= &hRows;
             for(int i=0;i<x;i++){
-                tempx=&(*tempx)->down;
+                fila=&(*fila)->down;
             }
-            nodo_x_anterior=tempx;
-            tempy=&*tempx;
+            columna=fila;
             do{
-                if((*tempy)->next==nullptr){
+                nodo_y_anterior=columna;
+                if((*columna)->next==nullptr){
                     break;
                 }
-                nodo_x_anterior=tempy;
-                tempy=&(*tempy)->next;
+                columna=&(*columna)->next;
             }
-            while((*tempy)->x<x);
-            //cout << (*nodo_y_anterior)->down << "---" << (*nodo_x_anterior)->next << endl;
-            if((*nodo_y_anterior)->down != nullptr && (*nodo_x_anterior)->next != nullptr){
-                if((*nodo_y_anterior)->down->y==y && (*nodo_x_anterior)->next->x == x){
-                    if(data==0){
-                        Node<T>* temp= (*nodo_x_anterior)->next;
-                        (*nodo_x_anterior)->next= (*nodo_x_anterior)->next->next;
-                        (*nodo_y_anterior)->down= (*nodo_y_anterior)->down->down;
-                        delete temp;
-                        return;
-                    }
-                    (*nodo_y_anterior)->down->set(x,y,data);
-                    return;
+            while((*columna)->y < y);
+
+            columna= &hColumns;
+            for(int i=0;i<y;i++){
+                columna=&(*columna)->next;
+            }
+            fila=columna;
+            do{
+                nodo_x_anterior=fila;
+                if((*fila)->down==nullptr){
+                    break;
                 }
+                fila=&(*fila)->down;
+            }
+            while((*fila)->x < x);
+
+            if(data==0){
+                Node<T>* temp= (*nodo_x_anterior)->down;
+                (*nodo_x_anterior)->down= (*nodo_x_anterior)->down->down;
+                (*nodo_y_anterior)->next= (*nodo_y_anterior)->next->next;
+                delete temp;
+                return;
             }
             Node<T>* nodo=new Node<T>;
             nodo->set(x,y,data);
-            nodo->next=(*nodo_x_anterior)->next;
-            nodo->down=(*nodo_y_anterior)->down;
-            (*nodo_x_anterior)->next=nodo;
-            (*nodo_y_anterior)->down=nodo;
+            nodo->next=(*nodo_y_anterior)->next;
+            nodo->down=(*nodo_x_anterior)->down;
+            (*nodo_y_anterior)->next=nodo;
+            (*nodo_x_anterior)->down=nodo;
         };
 
-
+        void print(){
+            cout << hColumns->next->next->next->next->down->get();
+            cout << hColumns->down->get();
+            cout << hColumns->down->down->get();
+            cout << hColumns->down->down->down->get();
+            cout << hColumns->down->down->down->down->get();
+            cout << hColumns->down->down->down->down->down->get();
+        }
         T operator()(int x, int y){
-            Node<T>* tempx=hRows;
-            Node<T>* tempy;
-            int contador=0;
+             Node<T>** fila= &hRows;
+            Node<T>** columna= &hColumns;
             for(int i=0;i<x;i++){
-                tempx=tempx->down;
+                fila=&(*fila)->down;
             }
-            tempy=tempx;
+            columna=fila;
             do{
-                if(tempy->next==nullptr){
+                if((*columna)->next==nullptr){
                     break;
                 }
-                tempy=tempy->next;
+                columna=&(*columna)->next;
             }
-            while(tempy->x<x);
-            if(tempy->x==x && tempy->y==y){
-                return tempy->get();
+            while((*columna)->y < y);
+
+            if((*columna)->y==y){
+                return (*columna)->get();
             }
             else{
                 return false;
             }
         };
-        void print(){
-            cout << hColumns->down->x << endl;
-            cout << hColumns->down->down->x << endl;
-            cout << hColumns->down->down->down->x << endl;
-        };
         Matrix<T> operator*(Matrix<T> other);
-        Matrix<T> operator*(T scalar);
-        Matrix<T> operator+(Matrix<T> other){
+        Matrix<T> operator*(T scalar){
             for(int x=0;x<5;x++){
                 for(int y=0;y<5;y++){
-                    //set(x,y,this->operator()(x,y)+ other.operator()(x,y));
+                    if(this->operator()(x,y)!=0){
+                        set(x,y,this->operator()(x,y)*scalar);
+                    }
                 }
             }
         };
-        Matrix<T> operator-(Matrix<T> other);
-        Matrix<T> transposed();
-        Matrix<T> operator=(Matrix<T> other);
+        Matrix<T> operator+(Matrix<T> other){
+            Matrix<int> c(5,5);
+            int suma=0;
+            for(int x=0;x<5;x++){
+                for(int y=0;y<5;y++){
+                    if(this->operator()(x,y)!=0 || other.operator()(x,y)!=0){
+                        c.set(x,y,this->operator()(x,y)+ other.operator()(x,y));
+                    }
+                }
+            }
+            return c;
+        };
+        Matrix<T> operator-(Matrix<T> other){
+            Matrix<int> c(5,5);
+            int resta=0;
+            for(int x=0;x<5;x++){
+                for(int y=0;y<5;y++){
+                    if(this->operator()(x,y)!=0 || other.operator()(x,y)!=0){
+                        c.set(x,y,this->operator()(x,y) - other.operator()(x,y));
+                    }
+                }
+            }
+            return c;
+        };
+        Matrix<T> transposed(){
+            Matrix<T> temp(rows,columns);
+            for(int x=0;x<rows;x++){
+                for(int y=0;y<columns;y++){
+                    if(this->operator()(x,y)!=0){
+                        temp.set(y,x,this->operator()(x,y));
+                    }
+                }
+            }
+            return temp;
+        };
+        Matrix<T> operator=(Matrix<T> other){
+            for(int x=0;x<5;x++){
+                for(int y=0;y<5;y++){
+                    set(x,y,0);
+                }
+            }
+            for(int x=0;x<5;x++){
+                for(int y=0;y<5;y++){
+                    if(other.operator()(x,y)!=0){
+                        set(x,y,other.operator()(x,y));
+                    }
+                }
+            }
+            return *this;
+        };
         //~Matrix();
 };
-
 #endif
